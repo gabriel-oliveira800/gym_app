@@ -101,10 +101,19 @@ class ThemeNotifier {
     };
   }
 
-  static Color colorByMode(Color light, Color dark) {
-    final mode = _instance.mode.value;
-    return switch (mode) { Brightness.light => light, Brightness.dark => dark };
+  Color colorByMode(Color light, Color dark) {
+    return switch (mode.value) {
+      Brightness.light => light,
+      Brightness.dark => dark
+    };
   }
 
-  static get iconColorByMode => colorByMode(Colors.black54, Colors.white54);
+  static iconColorByMode() =>
+      ThemeNotifier().colorByMode(Colors.black54, Colors.white54);
+
+  static borderColorByMode() =>
+      ThemeNotifier().colorByMode(Colors.black12, Colors.white12);
+
+  static textColorByMode() =>
+      ThemeNotifier().colorByMode(Colors.black, Colors.white);
 }
