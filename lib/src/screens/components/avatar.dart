@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/index.dart';
 import '../../components/index.dart';
 
 class Avatar extends StatefulWidget {
@@ -42,6 +43,41 @@ class _AvatarState extends State<Avatar> {
           },
         ),
       ),
+    );
+  }
+}
+
+class CategoryAvatar extends StatelessWidget {
+  final Size size;
+  final Photo photo;
+
+  const CategoryAvatar({
+    super.key,
+    required this.photo,
+    this.size = const Size.square(84),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: switch (photo) {
+        AssetPhoto() => Image.asset(
+            photo.source,
+            fit: BoxFit.cover,
+            width: size.width,
+            height: size.height,
+            errorBuilder: (_, __, ___) => const Icon(Icons.error),
+          ),
+        NetworkPhoto() => Image.network(
+            photo.source,
+            fit: BoxFit.cover,
+            width: size.width,
+            height: size.height,
+            errorBuilder: (_, __, ___) => const Icon(Icons.error),
+          ),
+        _ => const SizedBox(),
+      },
     );
   }
 }

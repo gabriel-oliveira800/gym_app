@@ -52,24 +52,26 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
           imageUrl: faker.image.loremPicsum(),
         ),
         const Spacing.horizontal(12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              DateTime.now().goodWithDate(),
-              style: TextStyle(
-                fontSize: 16,
-                color: ThemeNotifier.whiteOrBlackColor(),
+        ThemeWrapper(
+          builder: (__, _) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                DateTime.now().goodWithDate(),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: ThemeNotifier.whiteOrBlackColor(),
+                ),
               ),
-            ),
-            Text(
-              Strings.welcomeBack,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: ThemeNotifier.whiteOrBlackColor(),
+              Text(
+                Strings.welcomeBack,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: ThemeNotifier.whiteOrBlackColor(),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
@@ -87,13 +89,13 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
         ),
         prefixIcon: Icon(
           Icons.search,
-          color: ThemeNotifier.iconColorByMode,
+          color: ThemeNotifier.iconColorByMode(),
         ),
         suffixIcon: Visibility(
           visible: isSearching,
           child: IconButton(
             onPressed: search.clear,
-            icon: Icon(Icons.close, color: ThemeNotifier.iconColorByMode),
+            icon: Icon(Icons.close, color: ThemeNotifier.iconColorByMode()),
           ),
         ),
       ),
