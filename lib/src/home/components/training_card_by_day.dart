@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gym_app/shared/index.dart';
 
 import '../../../core/entities/index.dart';
 import '../../../shared/strings.dart';
@@ -118,12 +119,28 @@ class _TrainingCardByDayState extends State<TrainingCardByDay> {
                   Container(
                     width: _headerMaxWidth,
                     alignment: Alignment.center,
-                    child: Text(it.reps.toString(), style: style),
+                    child: Text(
+                      it.qntReps(),
+                      style: style.copyWith(
+                        fontWeight: it.isMaxRep.useValue(
+                          FontWeight.bold,
+                          FontWeight.w400,
+                        ),
+                      ),
+                    ),
                   ),
                   Container(
                     width: _headerMaxWidth,
                     alignment: Alignment.center,
-                    child: Text(it.sets.toString(), style: style),
+                    child: Text(
+                      it.qntSets(),
+                      style: style.copyWith(
+                        fontWeight: it.isMaxSet.useValue(
+                          FontWeight.bold,
+                          FontWeight.w400,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),

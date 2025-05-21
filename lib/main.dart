@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'core/external/isar_database.dart';
+import 'core/repository/index.dart';
 import 'gym_app.dart';
 
-void main() => runApp(const GymApp());
+final repository = Repository(IsarDatabase());
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await IsarDatabase().init();
+  runApp(const GymApp());
+}

@@ -4,18 +4,28 @@ class Exercise {
   final int day;
   final int reps;
   final int sets;
+  final String id;
   final String name;
+  final String categoryId;
 
   const Exercise({
+    required this.id,
     required this.day,
     required this.reps,
     required this.sets,
     required this.name,
+    required this.categoryId,
   });
+
+  bool get isMaxRep => reps < 0;
+  String qntReps() => reps < 0 ? 'MAX' : reps.toString();
+
+  bool get isMaxSet => sets < 0;
+  String qntSets() => sets < 0 ? 'MAX' : sets.toString();
 
   @override
   String toString() {
-    return 'Exercise(day: $day, reps: $reps, sets: $sets, name: $name)';
+    return 'Exercise(day: $day, reps: $reps, sets: $sets, id: $id, name: $name, categoryId: $categoryId)';
   }
 }
 

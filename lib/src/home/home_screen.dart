@@ -1,6 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 
 import '../../core/entities/index.dart';
+import '../../main.dart';
 import '../components/index.dart';
 import '../../shared/index.dart';
 
@@ -21,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = HomeController()..onLoad();
+    _controller = HomeController(repository)..onLoad();
     _searchController = TextEditingController();
   }
 
@@ -33,7 +36,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: _facActionButton(),
       body: AnimatedBuilder(
-        animation: _controller.categories,
+        animation: Listenable.merge([
+          _controller.type,
+          _controller.categories,
+        ]),
         builder: (_, __) => Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: _body(),
@@ -119,13 +125,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _facActionButton() {
     return FabActionsButton(
-      onCategory: () async {
-        final category = await AddCategoryContent.show(context);
-        if (category != null) await AddExerciseContent.show(context);
-      },
-      onExercise: () async {
-        await AddExerciseContent.show(context);
-      },
+      onExercise: _createExercise,
+      onCategory: _createCategory,
+    );
+  }
+
+  void _createCategory() async {
+    await AddCategoryContent.show(
+      context,
+      controller: _controller,
+    );
+  }
+
+  void _createExercise() async {
+    await AddExerciseContent.show(
+      context,
+      controller: _controller,
     );
   }
 

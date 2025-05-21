@@ -1,23 +1,33 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
-import 'package:faker/faker.dart' as t;
 
 import '../../components/index.dart';
 import '../../../shared/index.dart';
 import '../../../core/index.dart';
+import '../home_controller.dart';
 
 class AddExerciseContent extends StatefulWidget {
-  const AddExerciseContent({super.key});
+  final HomeController controller;
+
+  const AddExerciseContent({
+    super.key,
+    required this.controller,
+  });
 
   @override
   State<AddExerciseContent> createState() => _AddExerciseContentState();
 
-  static Future<Exercise?> show(BuildContext context) async {
+  static Future<Exercise?> show(
+    BuildContext context, {
+    required HomeController controller,
+  }) async {
     return await showModalBottomSheet<Exercise?>(
       context: context,
       shape: 16.modalShape(),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const AddExerciseContent(),
+      builder: (context) => AddExerciseContent(controller: controller),
     );
   }
 }
@@ -39,8 +49,29 @@ class _AddExerciseContentState extends State<AddExerciseContent> {
     _setsController = NumberEditingController();
   }
 
-  void _onSubmitButton() {
-    if (!_formKey.currentState!.validate()) return;
+  Category? _selectedCategory;
+  void onChanged(Category? value) {
+    setState(() => _selectedCategory = value);
+  }
+
+  bool _isLoading = false;
+  void _setLoading() => setState(() => _isLoading = !_isLoading);
+
+  void _onSubmitButton() async {
+    if (!_formKey.currentState!.validate() || _selectedCategory == null) return;
+
+    _setLoading();
+
+    await widget.controller.createExercise(
+      day: _selectedDate.value,
+      sets: _setsController.qnt,
+      reps: _repsController.qnt,
+      name: _nameController.text.trim(),
+      categoryId: _selectedCategory!.id,
+    );
+
+    _setLoading();
+
     Navigator.of(context).pop();
   }
 
@@ -70,7 +101,10 @@ class _AddExerciseContentState extends State<AddExerciseContent> {
                     ),
                   ),
                   const Spacing.vertical(32),
-                  _dropdownButton(),
+                  AnimatedBuilder(
+                    animation: widget.controller.categories,
+                    builder: (_, __) => _dropdownButton(),
+                  ),
                   const Spacing.vertical(32),
                   TextFormField(
                     controller: _nameController,
@@ -78,7 +112,7 @@ class _AddExerciseContentState extends State<AddExerciseContent> {
                       hintText: Strings.exerciseNameHint,
                     ),
                   ),
-                  const Spacing.vertical(8),
+                  const Spacing.vertical(12),
                   _seriesAndRepetitions(),
                   const Spacing.vertical(32),
                   _dayOfWeek(),
@@ -107,16 +141,42 @@ class _AddExerciseContentState extends State<AddExerciseContent> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
-          child: AddMoreInput(
-            hint: Strings.repsHint,
-            controller: _repsController,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                Strings.setsHint,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: ThemeNotifier.whiteOrBlackColor(),
+                ),
+              ),
+              const Spacing.vertical(8),
+              AddMoreInput(
+                controller: _setsController,
+              ),
+            ],
           ),
         ),
         const Spacing.horizontal(8),
         Expanded(
-          child: AddMoreInput(
-            hint: Strings.setsHint,
-            controller: _setsController,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                Strings.repsHint,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: ThemeNotifier.whiteOrBlackColor(),
+                ),
+              ),
+              const Spacing.vertical(8),
+              AddMoreInput(
+                controller: _repsController,
+              ),
+            ],
           ),
         ),
       ],
@@ -153,79 +213,56 @@ class _AddExerciseContentState extends State<AddExerciseContent> {
     );
   }
 
+  Widget _dropdownButton() {
+    final items = widget.controller.categories.value.map(
+      (it) => DropdownMenuItem(
+        value: it,
+        child: Text(
+          it.name,
+          style: const TextStyle(fontSize: 16),
+        ),
+      ),
+    );
+
+    return DropdownButtonFormField<Category>(
+      items: items.toList(),
+      value: _selectedCategory,
+      onChanged: (it) => _selectedCategory = it,
+      decoration: const InputDecoration(hintText: 'Categoria'),
+      validator: (value) {
+        if (value == null) return 'Selecione uma categoria';
+        return null;
+      },
+    );
+  }
+
   Widget _submitButton() {
+    final isEnabled = _nameController.text.isNotEmpty &&
+        _repsController.text.isNotEmpty &&
+        _setsController.text.isNotEmpty &&
+        _selectedCategory != null;
+
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _onSubmitButton,
+        onPressed: isEnabled ? _onSubmitButton : null,
         style: ElevatedButton.styleFrom(
           fixedSize: const Size.fromHeight(48),
           backgroundColor: ThemeNotifier.whiteOrBlackColor(),
           foregroundColor: ThemeNotifier.blackOrWhiteColor(),
         ),
-        child: const Text(
-          Strings.createExercise,
-          style: TextStyle(fontSize: 16),
-        ),
-      ),
-    );
-  }
-
-  Category? _selectedCategory;
-
-  List<Category> categories = [
-    Category(
-      id: t.faker.guid.guid(),
-      name: "Peito",
-      photo: Images.all.first,
-      exercises: [
-        const Exercise(name: "Tríceps Testa", reps: 10, sets: 3, day: 1),
-        const Exercise(name: "Tríceps Pulley", reps: 12, sets: 4, day: 2),
-      ],
-    ),
-    Category(
-      id: t.faker.guid.guid(),
-      name: 'Triceps',
-      photo: Images.all.first,
-      exercises: [
-        const Exercise(name: "Tríceps Testa", reps: 10, sets: 3, day: 1),
-        const Exercise(name: "Tríceps Pulley", reps: 12, sets: 4, day: 2),
-      ],
-    ),
-    Category(
-      photo: Images.all.first,
-      id: t.faker.guid.guid(),
-      name: 'Bíceps',
-      exercises: [
-        const Exercise(name: "Tríceps Testa", reps: 10, sets: 3, day: 1),
-        const Exercise(name: "Tríceps Pulley", reps: 12, sets: 4, day: 2),
-      ],
-    ),
-  ];
-
-  Widget _dropdownButton() {
-    return DropdownButtonFormField<Category>(
-      value: _selectedCategory,
-      items: categories
-          .map(
-            (c) => DropdownMenuItem(
-              value: c,
-              child: Text(
-                c.name,
-                style: const TextStyle(fontSize: 16),
-              ),
+        child: Visibility(
+          visible: !_isLoading,
+          replacement: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation(
+              ThemeNotifier.blackOrWhiteColor(),
             ),
-          )
-          .toList(),
-      onChanged: (value) => setState(() => _selectedCategory = value),
-      validator: (_) {
-        if (_selectedCategory == null) {
-          return 'Selecione uma categoria';
-        }
-        return null;
-      },
-      decoration: const InputDecoration(
-        hintText: 'Categoria',
+          ),
+          child: const Text(
+            Strings.createExercise,
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
       ),
     );
   }

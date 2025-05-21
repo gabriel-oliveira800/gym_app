@@ -8,7 +8,7 @@ class AddMoreInput extends StatelessWidget {
 
   const AddMoreInput({
     super.key,
-    required this.hint,
+    this.hint = '0',
     required this.controller,
   });
 

@@ -1,23 +1,33 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../components/index.dart';
 import '../../../shared/index.dart';
 import '../../../core/index.dart';
 
+import '../home_controller.dart';
+
 class AddCategoryContent extends StatefulWidget {
-  const AddCategoryContent({super.key});
+  final HomeController controller;
+  const AddCategoryContent({
+    super.key,
+    required this.controller,
+  });
 
   @override
   State<AddCategoryContent> createState() => _AddCategoryContentState();
 
-  static Future<Category?> show(BuildContext context) async {
-    return await showModalBottomSheet<Category?>(
+  static Future<void> show(
+    BuildContext context, {
+    required HomeController controller,
+  }) async {
+    return await showModalBottomSheet(
       context: context,
       shape: 16.modalShape(),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const AddCategoryContent(),
+      builder: (context) => AddCategoryContent(controller: controller),
     );
   }
 }
@@ -51,19 +61,23 @@ class _AddCategoryContentState extends State<AddCategoryContent> {
     _imageController.clear();
   }
 
-  void _onSubmitButton() {
+  bool _isLoading = false;
+  void _setLoading() => setState(() => _isLoading = !_isLoading);
+
+  void _onSubmitButton() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final category = Category(
-      id: const Uuid().v4(),
+    _setLoading();
+
+    await widget.controller.createCategory(
       name: _nameController.text.trim(),
-      photo: switch (_selectedImage != null) {
-        true => _selectedImage!,
-        _ => Images.randomPhoto(),
+      photo: switch (_selectedImage) {
+        null => Images.randomPhoto(),
+        _ => _selectedImage!,
       },
     );
 
-    Navigator.of(context).pop(category);
+    Navigator.of(context).pop();
   }
 
   @override
