@@ -5,5 +5,6 @@ export 'training_card_grouped.dart';
 export 'training_card_by_day.dart';
 export 'fab_actions_button.dart';
 export 'categories_group.dart';
+export 'empty_data.dart';
 export 'avatar.dart';
 export 'header.dart';

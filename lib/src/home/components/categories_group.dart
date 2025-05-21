@@ -5,8 +5,8 @@ import '../../components/index.dart';
 import '../../../shared/index.dart';
 
 enum CategoriaType {
-  grouped,
-  single;
+  list,
+  grouped;
 
   bool get isGrouped => this == CategoriaType.grouped;
 }
@@ -30,7 +30,7 @@ class CategoriesGroup extends StatelessWidget {
     this.onChangedWeekday,
     required this.categories,
     required this.onTypeChanged,
-    this.type = CategoriaType.single,
+    this.type = CategoriaType.list,
   });
 
   @override
@@ -38,9 +38,9 @@ class CategoriesGroup extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          Strings.categories,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        Text(
+          !type.isGrouped ? Strings.dayOfWeek : Strings.categories,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         const Spacing.vertical(12),
         SizedBox(
@@ -70,13 +70,13 @@ class CategoriesGroup extends StatelessWidget {
                   child: IconButton(
                     onPressed: () => onTypeChanged(
                       type.isGrouped
-                          ? CategoriaType.single
+                          ? CategoriaType.list
                           : CategoriaType.grouped,
                     ),
                     icon: Icon(
                       switch (type) {
+                        CategoriaType.list => Icons.list,
                         CategoriaType.grouped => Icons.grid_view,
-                        CategoriaType.single => Icons.list,
                       },
                     ),
                     color: ThemeNotifier().colorByMode(

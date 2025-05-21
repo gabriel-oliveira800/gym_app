@@ -28,6 +28,10 @@ class ExercisesByDay {
     required this.exercises,
   });
 
+  factory ExercisesByDay.group(MapEntry<int, List<Exercise>> data) {
+    return ExercisesByDay(day: data.key, exercises: data.value);
+  }
+
   @override
   String toString() {
     return 'ExercisesByDay(day: $day, exercises: $exercises)';

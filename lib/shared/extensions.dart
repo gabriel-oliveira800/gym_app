@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/index.dart';
 import 'strings.dart';
 
 extension DateTimeExtensions on DateTime {
@@ -35,4 +36,43 @@ extension DoubleExtensions on num {
 extension ContextExtensions on BuildContext {
   double get viewInsetsBottom => MediaQuery.of(this).viewInsets.bottom;
   EdgeInsets get bottomPadding => EdgeInsets.only(bottom: viewInsetsBottom);
+}
+
+extension CategoriesExtensions on Categories {
+  List<ExercisesByDay> group() {
+    final allExercises = expand((e) => e.exercises).toList();
+    final groupedByDay = <int, Exercises>{};
+
+    for (final exercise in allExercises) {
+      if (groupedByDay[exercise.day] == null) {
+        groupedByDay[exercise.day] = [];
+      }
+      groupedByDay[exercise.day]!.add(exercise);
+    }
+
+    return groupedByDay.entries.map(ExercisesByDay.group).toList();
+  }
+
+  Categories search(String search) {
+    if (search.isEmpty) return this;
+
+    return map(
+      (c) => Category(
+        id: c.id,
+        name: c.name,
+        photo: c.photo,
+        exercises: c.exercises.search(search),
+      ),
+    ).where((c) => c.exercises.isNotEmpty).toList();
+  }
+}
+
+extension ExercisesExtensions on Exercises {
+  Exercises search(String search) {
+    if (search.isEmpty) return this;
+
+    return where(
+      (it) => it.name.toLowerCase().contains(search.toLowerCase()),
+    ).toList();
+  }
 }

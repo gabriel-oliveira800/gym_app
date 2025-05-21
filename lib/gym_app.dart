@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'src/components/index.dart';
-import 'src/screens/index.dart';
+import 'src/home/index.dart';
 
 import 'shared/index.dart';
 
