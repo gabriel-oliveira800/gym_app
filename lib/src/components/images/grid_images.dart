@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gym_app/src/components/index.dart';
 
 import '../../../shared/images.dart';
 import '../../../core/index.dart';
+import '../index.dart';
 
 class GridImages extends StatelessWidget {
   final Photos gallery;
@@ -12,7 +12,7 @@ class GridImages extends StatelessWidget {
   const GridImages({
     super.key,
     this.selectedImage,
-    this.gallery = Images.all,
+    required this.gallery,
     required this.onSelected,
   });
 
@@ -53,6 +53,7 @@ class GridImages extends StatelessWidget {
           child: FadeInImage(
             fit: BoxFit.cover,
             placeholder: const AssetImage(Images.placeholder),
+            imageErrorBuilder: (_, __, ___) => Image.asset(Images.placeholder),
             image: switch (image) {
               AssetPhoto() => AssetImage(image.source),
               NetworkPhoto() => NetworkImage(image.source),

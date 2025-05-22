@@ -113,7 +113,7 @@ class _AddCategoryContentState extends State<AddCategoryContent> {
                     builder: (_, __) => _imageInput(),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.only(top: 16, bottom: 24),
                     child: GridImages(
                       gallery: _gallery,
                       onSelected: _onSelected,

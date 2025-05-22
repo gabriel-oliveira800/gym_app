@@ -7,14 +7,14 @@ abstract interface class Images {
 
   static const String placeholder = '$_root/placeholder-image.png';
 
-  static const String photo01 = '$_root/photo-01.png';
-  static const String photo02 = '$_root/photo-02.png';
-  static const String photo03 = '$_root/photo-03.png';
-  static const String photo04 = '$_root/photo-04.png';
-  static const String photo05 = '$_root/photo-05.png';
-  static const String photo06 = '$_root/photo-06.png';
-  static const String photo07 = '$_root/photo-07.png';
-  static const String photo08 = '$_root/photo-08.png';
+  static const String photo01 = '$_root/photo-01.jpg';
+  static const String photo02 = '$_root/photo-02.jpg';
+  static const String photo03 = '$_root/photo-03.jpg';
+  static const String photo04 = '$_root/photo-04.jpg';
+  static const String photo05 = '$_root/photo-05.jpg';
+  static const String photo06 = '$_root/photo-06.jpg';
+  static const String photo07 = '$_root/photo-07.jpg';
+  static const String photo08 = '$_root/photo-08.jpg';
 
   static const Photos all = [
     AssetPhoto(photo01, id: 'photo-01'),
