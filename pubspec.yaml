@@ -51,7 +51,3 @@ flutter:
         - asset: assets/fonts/Inter-Thin.ttf
         - asset: assets/fonts/Inter-Black.ttf
         - asset: assets/fonts/Inter-Bold.ttf
-
-flutter_launcher_icons:
-  android: "launcher_icon"
-  image_path: "assets/images/icon.png"
