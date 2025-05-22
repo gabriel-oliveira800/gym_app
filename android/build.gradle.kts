@@ -1,7 +1,26 @@
+import com.android.build.gradle.BaseExtension
+
 allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+
+    subprojects {
+        afterEvaluate {
+            if (plugins.hasPlugin("com.android.library") || plugins.hasPlugin("com.android.application")) {
+                extensions.findByName("android")?.let { ext ->
+                    val android = ext as? BaseExtension
+                    android?.let {
+                        if (it.namespace.isNullOrBlank()) {
+                            val defaultNamespace = group.toString()
+                            it.namespace = defaultNamespace
+                            println("Namespace não definido para $name, usando padrão: $defaultNamespace")
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

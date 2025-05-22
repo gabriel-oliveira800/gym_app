@@ -10,4 +10,5 @@ abstract interface class Svgs {
 
   static const String createExercise = '$_root/create_exercise.svg';
   static const String createCategory = '$_root/create_category.svg';
+  static const String database = '$_root/database.svg';
 }

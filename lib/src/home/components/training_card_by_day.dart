@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gym_app/shared/index.dart';
 
 import '../../../core/entities/index.dart';
-import '../../../shared/strings.dart';
 import '../../components/index.dart';
 
 class TrainingCardByDay extends StatefulWidget {

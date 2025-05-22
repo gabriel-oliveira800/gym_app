@@ -1,4 +1,3 @@
-import 'package:faker/faker.dart';
 import 'package:flutter/material.dart';
 
 import '../../../shared/index.dart';
@@ -21,7 +20,7 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -48,8 +47,8 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
   Widget _welcome() {
     return Row(
       children: [
-        Avatar(
-          imageUrl: faker.image.loremPicsum(),
+        const Avatar(
+          imageUrl: Strings.profileUrl,
         ),
         const Spacing.horizontal(12),
         ThemeWrapper(

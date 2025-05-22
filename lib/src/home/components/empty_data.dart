@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../../shared/svgs.dart';
+import '../../components/index.dart';
 
 class EmptyData extends StatelessWidget {
   const EmptyData({super.key});
@@ -9,12 +13,12 @@ class EmptyData extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.inbox,
-            size: 64,
-            color: Colors.grey[400],
+          SvgPicture.asset(
+            width: 64,
+            height: 64,
+            Svgs.database,
           ),
-          const SizedBox(height: 16),
+          const Spacing.vertical(16),
           Text(
             'Nenhum dado encontrado',
             style: TextStyle(

@@ -45,4 +45,7 @@ abstract class Strings {
     'Sábado',
     'Domingo',
   ];
+
+  static const String profileUrl =
+      'https://avatars.githubusercontent.com/u/60442055?s=400&u=125be1c1d6163b5f4978528418811bbae71754fe&v=4';
 }
