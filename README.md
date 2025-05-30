@@ -63,4 +63,4 @@ flutter pub get
 flutter run
 ```
 
-icons library: https://feathericons.com/?query=che
+icons library: https://feathericons.com
