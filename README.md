@@ -47,9 +47,9 @@ O app conta com **modo escuro/claro** e um toggle inspirado na interface do Chat
 
 ## 📸 Preview
 
-| Tela Inicial | Categoria Expandida | Agrupado por Dia |
+| Tela Inicial | Categoria | Exercícios |
 |--------------|---------------------|------------------|
-| ![tela](screenshot/demo_01.png) | ![categoria](screenshot/demo_02.png) | ![dia](screenshot/demo_03.png) |
+| ![tela](screenshot/demo_01.png) | ![categoria](screenshot/demo_03.png) | ![dia](screenshot/demo_02.png) |
 
 ---
 
