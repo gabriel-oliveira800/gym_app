@@ -24,27 +24,28 @@ abstract class Strings {
   static const String repsHint = 'Repetições';
   static const String setsHint = 'Séries';
   static const String dayOfWeek = 'Dia da semana';
+  static const String daysOfWeek = 'Dias da semana';
 
-  static const trainingLabels = ['Exercício', 'Seq', 'Rep', 'Dia'];
-  static const shortWeekdays = [
-    'Seg',
-    'Ter',
-    'Qua',
-    'Qui',
-    'Sex',
-    'Sáb',
-    'Dom',
-  ];
+  static const trainingLabels = ['Exercício', 'Ser', 'Rep', 'Dia'];
+  static const shortWeekdays = {
+    1: 'Seg',
+    2: 'Ter',
+    3: 'Qua',
+    4: 'Qui',
+    5: 'Sex',
+    6: 'Sáb',
+    7: 'Dom',
+  };
 
-  static const List<String> weekdays = [
-    'Segunda',
-    'Terça',
-    'Quarta',
-    'Quinta',
-    'Sexta',
-    'Sábado',
-    'Domingo',
-  ];
+  static const weekdays = {
+    1: 'Segunda',
+    2: 'Terça',
+    3: 'Quarta',
+    4: 'Quinta',
+    5: 'Sexta',
+    6: 'Sábado',
+    7: 'Domingo',
+  };
 
   static const String profileUrl =
       'https://avatars.githubusercontent.com/u/60442055?s=400&u=125be1c1d6163b5f4978528418811bbae71754fe&v=4';

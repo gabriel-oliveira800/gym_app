@@ -1,12 +1,10 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 
 import '../../core/entities/index.dart';
 import '../../main.dart';
-import '../components/index.dart';
 import '../../shared/index.dart';
-
+import '../../shared/states/index.dart';
+import '../components/index.dart';
 import 'components/index.dart';
 import 'home_controller.dart';
 
@@ -19,107 +17,52 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final HomeController _controller;
-  late final TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
     _controller = HomeController(repository)..onLoad();
-    _searchController = TextEditingController();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: Header(
-        search: _searchController,
+        controller: _controller,
       ),
       floatingActionButton: _facActionButton(),
-      body: AnimatedBuilder(
-        animation: Listenable.merge([
-          _controller.type,
-          _controller.categories,
-        ]),
-        builder: (_, __) => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: _body(),
-        ),
-      ),
-    );
-  }
-
-  Widget _categoriesOrDayOfWeek(Categories categories) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([
-        _controller.type,
-        _controller.selectedWeekday,
-        _controller.selectedCategory,
-      ]),
-      builder: (_, __) => CategoriesGroup(
-        categories: categories,
-        type: _controller.type.value,
-        onTypeChanged: _controller.setType,
-        onChanged: _controller.setSelectedCategory,
-        selected: _controller.selectedCategory.value,
-        onChangedWeekday: _controller.setSelectedWeekday,
-        selectedWeekday: _controller.selectedWeekday.value,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: _body(),
       ),
     );
   }
 
   Widget _body() {
-    if (_controller.categories.value.isEmpty) {
-      return const EmptyData();
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Spacing.vertical(18),
-        _categoriesOrDayOfWeek(_controller.categories.value),
-        const Spacing.vertical(24),
-        Expanded(
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              child: switch (_controller.type.value) {
-                CategoriaType.grouped => _groupedContent(
-                    _controller.categories.value,
-                  ),
-                CategoriaType.list => _listContent(
-                    _controller.categories.value,
-                  ),
-              },
-            ),
+        StateOfBuilder(
+          state: _controller.categories,
+          builder: (categories) => CategoriesGroup(
+            categories: categories,
+            controller: _controller,
           ),
+        ),
+        const Spacing.vertical(24),
+        MultiStateOfBuilder<ExercisesBy, List<int>>(
+          states: [_controller.exercises, _controller.weekdays],
+          builder: (exercises, weekdays) => _content(exercises, weekdays),
         ),
       ],
     );
   }
 
-  Widget _groupedContent(Categories categories) {
-    return AnimatedBuilder(
-      animation: _searchController,
-      builder: (_, __) {
-        final filtered = categories.search(_searchController.text);
-
-        return ListView.separated(
-          padding: EdgeInsets.zero,
-          itemCount: filtered.length,
-          separatorBuilder: (_, __) => const Spacing.vertical(8),
-          itemBuilder: (_, index) => TrainingCardGrouped(
-            category: filtered[index],
-            onPressed: _controller.setSelectedCategory,
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _listContent(Categories categories) {
-    return TrainingCardByDay(
-      exercises: categories.group(),
+  Widget _content(ExercisesBy data, List<int> weekdays) {
+    return Expanded(
+      child: GroupedExerciseByWeekday(
+        exercises: data.filterByWeekdays(weekdays),
+      ),
     );
   }
 
@@ -131,22 +74,26 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _createCategory() async {
-    await AddCategoryContent.show(
+    final result = await AddCategoryContent.show(
       context,
       controller: _controller,
     );
+
+    if (result != null) await _controller.onLoad();
   }
 
   void _createExercise() async {
-    await AddExerciseContent.show(
+    final result = await AddExerciseContent.show(
       context,
-      controller: _controller,
+      categories: _controller.categories.value,
     );
+
+    if (result != null) await _controller.onLoad();
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    // _controller.dispose();
     super.dispose();
   }
 }

@@ -2,42 +2,32 @@ import 'package:flutter/material.dart';
 
 import '../../../shared/index.dart';
 import '../../components/index.dart';
-
+import '../home_controller.dart';
 import 'avatar.dart';
 
 class Header extends StatelessWidget implements PreferredSizeWidget {
-  final TextEditingController search;
+  final HomeController controller;
 
   const Header({
     super.key,
-    required this.search,
+    required this.controller,
   });
 
   @override
-  Size get preferredSize => const Size.fromHeight(176);
+  Size get preferredSize => const Size.fromHeight(83);
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
+        padding: const EdgeInsets.all(20).copyWith(bottom: 0),
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _welcome(),
-                const Spacing.horizontal(8),
-                const ThemeToggle(),
-              ],
-            ),
-            const Spacing.vertical(20),
-            AnimatedBuilder(
-              animation: search,
-              builder: (_, __) => _searchBar(search.text.isNotEmpty),
-            ),
-            const Spacing.vertical(20),
+            _welcome(),
+            const Spacing.horizontal(8),
+            const ThemeToggle(),
           ],
         ),
       ),
@@ -46,6 +36,7 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
 
   Widget _welcome() {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Avatar(
           imageUrl: Strings.profileUrl,
@@ -73,31 +64,6 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _searchBar(bool isSearching) {
-    return TextFormField(
-      controller: search,
-      decoration: InputDecoration(
-        filled: true,
-        hintText: Strings.searchHint,
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(24),
-        ),
-        prefixIcon: Icon(
-          Icons.search,
-          color: ThemeNotifier.iconColorByMode(),
-        ),
-        suffixIcon: Visibility(
-          visible: isSearching,
-          child: IconButton(
-            onPressed: search.clear,
-            icon: Icon(Icons.close, color: ThemeNotifier.iconColorByMode()),
-          ),
-        ),
-      ),
     );
   }
 }

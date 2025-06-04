@@ -17,15 +17,15 @@ const ExerciseDtoSchema = CollectionSchema(
   name: r'ExerciseDto',
   id: 5124351465088375986,
   properties: {
-    r'categoryId': PropertySchema(
+    r'categories': PropertySchema(
       id: 0,
-      name: r'categoryId',
-      type: IsarType.string,
+      name: r'categories',
+      type: IsarType.stringList,
     ),
-    r'day': PropertySchema(
+    r'days': PropertySchema(
       id: 1,
-      name: r'day',
-      type: IsarType.long,
+      name: r'days',
+      type: IsarType.longList,
     ),
     r'id': PropertySchema(
       id: 2,
@@ -37,14 +37,14 @@ const ExerciseDtoSchema = CollectionSchema(
       name: r'name',
       type: IsarType.string,
     ),
-    r'reps': PropertySchema(
+    r'repetitions': PropertySchema(
       id: 4,
-      name: r'reps',
+      name: r'repetitions',
       type: IsarType.long,
     ),
-    r'sets': PropertySchema(
+    r'series': PropertySchema(
       id: 5,
-      name: r'sets',
+      name: r'series',
       type: IsarType.long,
     )
   },
@@ -68,7 +68,14 @@ int _exerciseDtoEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  bytesCount += 3 + object.categoryId.length * 3;
+  bytesCount += 3 + object.categories.length * 3;
+  {
+    for (var i = 0; i < object.categories.length; i++) {
+      final value = object.categories[i];
+      bytesCount += value.length * 3;
+    }
+  }
+  bytesCount += 3 + object.days.length * 8;
   bytesCount += 3 + object.id.length * 3;
   bytesCount += 3 + object.name.length * 3;
   return bytesCount;
@@ -80,12 +87,12 @@ void _exerciseDtoSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.categoryId);
-  writer.writeLong(offsets[1], object.day);
+  writer.writeStringList(offsets[0], object.categories);
+  writer.writeLongList(offsets[1], object.days);
   writer.writeString(offsets[2], object.id);
   writer.writeString(offsets[3], object.name);
-  writer.writeLong(offsets[4], object.reps);
-  writer.writeLong(offsets[5], object.sets);
+  writer.writeLong(offsets[4], object.repetitions);
+  writer.writeLong(offsets[5], object.series);
 }
 
 ExerciseDto _exerciseDtoDeserialize(
@@ -95,12 +102,12 @@ ExerciseDto _exerciseDtoDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = ExerciseDto();
-  object.categoryId = reader.readString(offsets[0]);
-  object.day = reader.readLong(offsets[1]);
+  object.categories = reader.readStringList(offsets[0]) ?? [];
+  object.days = reader.readLongList(offsets[1]) ?? [];
   object.id = reader.readString(offsets[2]);
   object.name = reader.readString(offsets[3]);
-  object.reps = reader.readLong(offsets[4]);
-  object.sets = reader.readLong(offsets[5]);
+  object.repetitions = reader.readLong(offsets[4]);
+  object.series = reader.readLong(offsets[5]);
   return object;
 }
 
@@ -112,9 +119,9 @@ P _exerciseDtoDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 1:
-      return (reader.readLong(offset)) as P;
+      return (reader.readLongList(offset) ?? []) as P;
     case 2:
       return (reader.readString(offset)) as P;
     case 3:
@@ -223,13 +230,13 @@ extension ExerciseDtoQueryWhere
 extension ExerciseDtoQueryFilter
     on QueryBuilder<ExerciseDto, ExerciseDto, QFilterCondition> {
   QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
-      categoryIdEqualTo(
+      categoriesElementEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'categoryId',
+        property: r'categories',
         value: value,
         caseSensitive: caseSensitive,
       ));
@@ -237,7 +244,7 @@ extension ExerciseDtoQueryFilter
   }
 
   QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
-      categoryIdGreaterThan(
+      categoriesElementGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -245,7 +252,7 @@ extension ExerciseDtoQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'categoryId',
+        property: r'categories',
         value: value,
         caseSensitive: caseSensitive,
       ));
@@ -253,7 +260,7 @@ extension ExerciseDtoQueryFilter
   }
 
   QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
-      categoryIdLessThan(
+      categoriesElementLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -261,7 +268,7 @@ extension ExerciseDtoQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'categoryId',
+        property: r'categories',
         value: value,
         caseSensitive: caseSensitive,
       ));
@@ -269,7 +276,7 @@ extension ExerciseDtoQueryFilter
   }
 
   QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
-      categoryIdBetween(
+      categoriesElementBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -278,7 +285,7 @@ extension ExerciseDtoQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'categoryId',
+        property: r'categories',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -289,13 +296,13 @@ extension ExerciseDtoQueryFilter
   }
 
   QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
-      categoryIdStartsWith(
+      categoriesElementStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'categoryId',
+        property: r'categories',
         value: value,
         caseSensitive: caseSensitive,
       ));
@@ -303,13 +310,13 @@ extension ExerciseDtoQueryFilter
   }
 
   QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
-      categoryIdEndsWith(
+      categoriesElementEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'categoryId',
+        property: r'categories',
         value: value,
         caseSensitive: caseSensitive,
       ));
@@ -317,10 +324,10 @@ extension ExerciseDtoQueryFilter
   }
 
   QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
-      categoryIdContains(String value, {bool caseSensitive = true}) {
+      categoriesElementContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
-        property: r'categoryId',
+        property: r'categories',
         value: value,
         caseSensitive: caseSensitive,
       ));
@@ -328,10 +335,10 @@ extension ExerciseDtoQueryFilter
   }
 
   QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
-      categoryIdMatches(String pattern, {bool caseSensitive = true}) {
+      categoriesElementMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
-        property: r'categoryId',
+        property: r'categories',
         wildcard: pattern,
         caseSensitive: caseSensitive,
       ));
@@ -339,62 +346,154 @@ extension ExerciseDtoQueryFilter
   }
 
   QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
-      categoryIdIsEmpty() {
+      categoriesElementIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'categoryId',
+        property: r'categories',
         value: '',
       ));
     });
   }
 
   QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
-      categoryIdIsNotEmpty() {
+      categoriesElementIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'categoryId',
+        property: r'categories',
         value: '',
       ));
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> dayEqualTo(
-      int value) {
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      categoriesLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'categories',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      categoriesIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'categories',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      categoriesIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'categories',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      categoriesLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'categories',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      categoriesLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'categories',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      categoriesLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'categories',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      daysElementEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'day',
+        property: r'days',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> dayGreaterThan(
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      daysElementGreaterThan(
     int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'day',
+        property: r'days',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> dayLessThan(
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      daysElementLessThan(
     int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'day',
+        property: r'days',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> dayBetween(
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      daysElementBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -402,12 +501,100 @@ extension ExerciseDtoQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'day',
+        property: r'days',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
       ));
+    });
+  }
+
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      daysLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'days',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> daysIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'days',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      daysIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'days',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      daysLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'days',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      daysLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'days',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      daysLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'days',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
     });
   }
 
@@ -726,43 +913,46 @@ extension ExerciseDtoQueryFilter
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> repsEqualTo(
-      int value) {
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      repetitionsEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'reps',
+        property: r'repetitions',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> repsGreaterThan(
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      repetitionsGreaterThan(
     int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'reps',
+        property: r'repetitions',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> repsLessThan(
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      repetitionsLessThan(
     int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'reps',
+        property: r'repetitions',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> repsBetween(
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      repetitionsBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -770,7 +960,7 @@ extension ExerciseDtoQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'reps',
+        property: r'repetitions',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -779,43 +969,44 @@ extension ExerciseDtoQueryFilter
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> setsEqualTo(
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> seriesEqualTo(
       int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'sets',
+        property: r'series',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> setsGreaterThan(
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition>
+      seriesGreaterThan(
     int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'sets',
+        property: r'series',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> setsLessThan(
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> seriesLessThan(
     int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'sets',
+        property: r'series',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> setsBetween(
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterFilterCondition> seriesBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -823,7 +1014,7 @@ extension ExerciseDtoQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'sets',
+        property: r'series',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -841,30 +1032,6 @@ extension ExerciseDtoQueryLinks
 
 extension ExerciseDtoQuerySortBy
     on QueryBuilder<ExerciseDto, ExerciseDto, QSortBy> {
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> sortByCategoryId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'categoryId', Sort.asc);
-    });
-  }
-
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> sortByCategoryIdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'categoryId', Sort.desc);
-    });
-  }
-
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> sortByDay() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'day', Sort.asc);
-    });
-  }
-
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> sortByDayDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'day', Sort.desc);
-    });
-  }
-
   QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> sortById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -889,57 +1056,33 @@ extension ExerciseDtoQuerySortBy
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> sortByReps() {
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> sortByRepetitions() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'reps', Sort.asc);
+      return query.addSortBy(r'repetitions', Sort.asc);
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> sortByRepsDesc() {
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> sortByRepetitionsDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'reps', Sort.desc);
+      return query.addSortBy(r'repetitions', Sort.desc);
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> sortBySets() {
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> sortBySeries() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'sets', Sort.asc);
+      return query.addSortBy(r'series', Sort.asc);
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> sortBySetsDesc() {
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> sortBySeriesDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'sets', Sort.desc);
+      return query.addSortBy(r'series', Sort.desc);
     });
   }
 }
 
 extension ExerciseDtoQuerySortThenBy
     on QueryBuilder<ExerciseDto, ExerciseDto, QSortThenBy> {
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> thenByCategoryId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'categoryId', Sort.asc);
-    });
-  }
-
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> thenByCategoryIdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'categoryId', Sort.desc);
-    });
-  }
-
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> thenByDay() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'day', Sort.asc);
-    });
-  }
-
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> thenByDayDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'day', Sort.desc);
-    });
-  }
-
   QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -976,43 +1119,42 @@ extension ExerciseDtoQuerySortThenBy
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> thenByReps() {
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> thenByRepetitions() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'reps', Sort.asc);
+      return query.addSortBy(r'repetitions', Sort.asc);
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> thenByRepsDesc() {
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> thenByRepetitionsDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'reps', Sort.desc);
+      return query.addSortBy(r'repetitions', Sort.desc);
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> thenBySets() {
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> thenBySeries() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'sets', Sort.asc);
+      return query.addSortBy(r'series', Sort.asc);
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> thenBySetsDesc() {
+  QueryBuilder<ExerciseDto, ExerciseDto, QAfterSortBy> thenBySeriesDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'sets', Sort.desc);
+      return query.addSortBy(r'series', Sort.desc);
     });
   }
 }
 
 extension ExerciseDtoQueryWhereDistinct
     on QueryBuilder<ExerciseDto, ExerciseDto, QDistinct> {
-  QueryBuilder<ExerciseDto, ExerciseDto, QDistinct> distinctByCategoryId(
-      {bool caseSensitive = true}) {
+  QueryBuilder<ExerciseDto, ExerciseDto, QDistinct> distinctByCategories() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'categoryId', caseSensitive: caseSensitive);
+      return query.addDistinctBy(r'categories');
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QDistinct> distinctByDay() {
+  QueryBuilder<ExerciseDto, ExerciseDto, QDistinct> distinctByDays() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'day');
+      return query.addDistinctBy(r'days');
     });
   }
 
@@ -1030,15 +1172,15 @@ extension ExerciseDtoQueryWhereDistinct
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QDistinct> distinctByReps() {
+  QueryBuilder<ExerciseDto, ExerciseDto, QDistinct> distinctByRepetitions() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'reps');
+      return query.addDistinctBy(r'repetitions');
     });
   }
 
-  QueryBuilder<ExerciseDto, ExerciseDto, QDistinct> distinctBySets() {
+  QueryBuilder<ExerciseDto, ExerciseDto, QDistinct> distinctBySeries() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'sets');
+      return query.addDistinctBy(r'series');
     });
   }
 }
@@ -1051,15 +1193,16 @@ extension ExerciseDtoQueryProperty
     });
   }
 
-  QueryBuilder<ExerciseDto, String, QQueryOperations> categoryIdProperty() {
+  QueryBuilder<ExerciseDto, List<String>, QQueryOperations>
+      categoriesProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'categoryId');
+      return query.addPropertyName(r'categories');
     });
   }
 
-  QueryBuilder<ExerciseDto, int, QQueryOperations> dayProperty() {
+  QueryBuilder<ExerciseDto, List<int>, QQueryOperations> daysProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'day');
+      return query.addPropertyName(r'days');
     });
   }
 
@@ -1075,15 +1218,15 @@ extension ExerciseDtoQueryProperty
     });
   }
 
-  QueryBuilder<ExerciseDto, int, QQueryOperations> repsProperty() {
+  QueryBuilder<ExerciseDto, int, QQueryOperations> repetitionsProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'reps');
+      return query.addPropertyName(r'repetitions');
     });
   }
 
-  QueryBuilder<ExerciseDto, int, QQueryOperations> setsProperty() {
+  QueryBuilder<ExerciseDto, int, QQueryOperations> seriesProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'sets');
+      return query.addPropertyName(r'series');
     });
   }
 }

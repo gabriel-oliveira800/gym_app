@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import '../../../shared/images.dart';
@@ -20,6 +22,7 @@ class GridImages extends StatelessWidget {
   Widget build(BuildContext context) {
     return GridView.builder(
       shrinkWrap: true,
+      padding: EdgeInsets.zero,
       itemCount: gallery.length,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -53,7 +56,10 @@ class GridImages extends StatelessWidget {
           child: FadeInImage(
             fit: BoxFit.cover,
             placeholder: const AssetImage(Images.placeholder),
-            imageErrorBuilder: (_, __, ___) => Image.asset(Images.placeholder),
+            imageErrorBuilder: (_, error, stack) {
+              log('Error: $error', error: error, stackTrace: stack);
+              return Image.asset(Images.placeholder);
+            },
             image: switch (image) {
               AssetPhoto() => AssetImage(image.source),
               NetworkPhoto() => NetworkImage(image.source),

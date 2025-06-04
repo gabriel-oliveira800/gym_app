@@ -12,6 +12,8 @@ extension DateTimeExtensions on DateTime {
       _ => Strings.goodMorning,
     };
   }
+
+  DateTime day(int newDay) => DateTime(year, month, newDay);
 }
 
 extension BoolExtensions on bool {
@@ -23,6 +25,8 @@ extension BoolExtensions on bool {
 }
 
 extension DoubleExtensions on num {
+  Duration get duration => Duration(milliseconds: toInt());
+
   RoundedRectangleBorder modalShape() {
     return RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(toDouble())),
@@ -38,41 +42,23 @@ extension ContextExtensions on BuildContext {
   EdgeInsets get bottomPadding => EdgeInsets.only(bottom: viewInsetsBottom);
 }
 
-extension CategoriesExtensions on Categories {
-  List<ExercisesByDay> group() {
-    final allExercises = expand((e) => e.exercises).toList();
-    final groupedByDay = <int, Exercises>{};
+extension TextEditingExtensions on TextEditingController {
+  bool get isEmpty => text.isEmpty;
+  bool get isNotEmpty => text.isNotEmpty;
+}
 
-    for (final exercise in allExercises) {
-      if (groupedByDay[exercise.day] == null) {
-        groupedByDay[exercise.day] = [];
-      }
-      groupedByDay[exercise.day]!.add(exercise);
-    }
-
-    return groupedByDay.entries.map(ExercisesByDay.group).toList();
-  }
-
-  Categories search(String search) {
-    if (search.isEmpty) return this;
-
-    return map(
-      (c) => Category(
-        id: c.id,
-        name: c.name,
-        photo: c.photo,
-        exercises: c.exercises.search(search),
-      ),
-    ).where((c) => c.exercises.isNotEmpty).toList();
+extension StrExtensions on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return '${this[0].toUpperCase()}${substring(1)}';
   }
 }
 
-extension ExercisesExtensions on Exercises {
-  Exercises search(String search) {
-    if (search.isEmpty) return this;
+extension ExercisesByExtensions on ExercisesBy {
+  ExercisesBy filterByWeekdays(List<int> weekdays) {
+    if (weekdays.isEmpty) return this;
 
-    return where(
-      (it) => it.name.toLowerCase().contains(search.toLowerCase()),
-    ).toList();
+    sort((a, b) => a.weekday.compareTo(b.weekday));
+    return where((it) => weekdays.contains(it.weekday)).toList();
   }
 }

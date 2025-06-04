@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 import '../../../shared/index.dart';
@@ -18,6 +19,7 @@ class ListItem extends StatelessWidget {
   final bool isSelected;
   final VoidCallback? onTap;
   final ListItemStyle style;
+  final BoxConstraints constraints;
 
   const ListItem({
     super.key,
@@ -25,6 +27,7 @@ class ListItem extends StatelessWidget {
     required this.name,
     this.isSelected = false,
     this.style = const ListItemStyle(),
+    this.constraints = const BoxConstraints(maxHeight: 32),
   });
 
   @override
@@ -57,16 +60,18 @@ class ListItem extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(style.radius),
           child: AnimatedContainer(
-            height: 32,
             padding: style.padding,
+            constraints: constraints,
             duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
               color: bgColor,
               borderRadius: BorderRadius.circular(style.radius),
             ),
             alignment: Alignment.center,
-            child: Text(
+            child: AutoSizeText(
               name,
+              maxLines: 1,
+              minFontSize: 8,
               style: TextStyle(
                 color: textColor,
                 fontWeight: FontWeight.bold,

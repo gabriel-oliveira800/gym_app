@@ -1,37 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:gym_app/shared/index.dart';
 
-import '../../../core/entities/index.dart';
+import '../../../core/index.dart';
+import '../../../shared/index.dart';
 import '../../components/index.dart';
+import 'index.dart';
 
-class TrainingCardByDay extends StatefulWidget {
-  final List<ExercisesByDay> exercises;
+class GroupedExerciseByWeekday extends StatelessWidget {
+  final ExercisesBy exercises;
 
-  const TrainingCardByDay({
+  const GroupedExerciseByWeekday({
     super.key,
     required this.exercises,
   });
 
   @override
-  State<TrainingCardByDay> createState() => _TrainingCardByDayState();
-}
-
-class _TrainingCardByDayState extends State<TrainingCardByDay> {
-  @override
   Widget build(BuildContext context) {
+    if (exercises.isEmpty) return const EmptyData();
+
     return ListView.separated(
       shrinkWrap: true,
       padding: EdgeInsets.zero,
-      itemCount: widget.exercises.length,
+      itemCount: exercises.length,
       separatorBuilder: (_, __) => const Spacing.vertical(16),
       itemBuilder: (context, index) {
-        final data = widget.exercises[index];
+        final data = exercises[index];
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '📅 ${Strings.weekdays[data.day]}',
+              '📅 ${Strings.weekdays[data.weekday]}',
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -74,9 +72,7 @@ class _TrainingCardByDayState extends State<TrainingCardByDay> {
   static const _headerMaxWidth = 64.0;
 
   Widget _header() {
-    final style = const TextStyle(
-      fontWeight: FontWeight.bold,
-    );
+    final style = const TextStyle(fontWeight: FontWeight.bold);
 
     return Container(
       height: 32.0,
@@ -89,12 +85,12 @@ class _TrainingCardByDayState extends State<TrainingCardByDay> {
           Container(
             width: _headerMaxWidth,
             alignment: Alignment.center,
-            child: Text(Strings.trainingLabels[2], style: style),
+            child: Text(Strings.trainingLabels[1], style: style),
           ),
           Container(
             width: _headerMaxWidth,
             alignment: Alignment.center,
-            child: Text(Strings.trainingLabels[1], style: style),
+            child: Text(Strings.trainingLabels[2], style: style),
           ),
         ],
       ),
@@ -113,15 +109,15 @@ class _TrainingCardByDayState extends State<TrainingCardByDay> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(it.name, style: style),
+                    child: Text(it.name.capitalize(), style: style),
                   ),
                   Container(
                     width: _headerMaxWidth,
                     alignment: Alignment.center,
                     child: Text(
-                      it.qntReps(),
+                      it.qntSets(),
                       style: style.copyWith(
-                        fontWeight: it.isMaxRep.useValue(
+                        fontWeight: it.isMaxSet.useValue(
                           FontWeight.bold,
                           FontWeight.w400,
                         ),
@@ -132,9 +128,9 @@ class _TrainingCardByDayState extends State<TrainingCardByDay> {
                     width: _headerMaxWidth,
                     alignment: Alignment.center,
                     child: Text(
-                      it.qntSets(),
+                      it.qntReps(),
                       style: style.copyWith(
-                        fontWeight: it.isMaxSet.useValue(
+                        fontWeight: it.isMaxRep.useValue(
                           FontWeight.bold,
                           FontWeight.w400,
                         ),

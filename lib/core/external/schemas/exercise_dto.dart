@@ -10,22 +10,34 @@ class ExerciseDto {
   Id get isarId => fastHash(id);
 
   late String id;
-  late String categoryId;
-
-  late int day;
-  late int reps;
-  late int sets;
   late String name;
+
+  late int series;
+  late int repetitions;
+
+  late List<int> days;
+  late List<String> categories;
 
   ExerciseDto();
 
   factory ExerciseDto.by(Exercise exercise) {
     return ExerciseDto()
       ..id = exercise.id
-      ..day = exercise.day
-      ..reps = exercise.reps
-      ..sets = exercise.sets
       ..name = exercise.name
-      ..categoryId = exercise.categoryId;
+      ..days = exercise.days
+      ..series = exercise.series
+      ..categories = exercise.categories
+      ..repetitions = exercise.repetitions;
+  }
+
+  Exercise toDomain() {
+    return Exercise(
+      id: id,
+      days: days,
+      name: name,
+      series: series,
+      categories: categories,
+      repetitions: repetitions,
+    );
   }
 }

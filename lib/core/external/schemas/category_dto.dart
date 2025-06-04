@@ -21,6 +21,14 @@ class CategoryDto {
       ..name = category.name
       ..photo = PhotoDto.by(category.photo);
   }
+
+  Category toDomain() {
+    return Category(
+      id: id,
+      name: name,
+      photo: photo.toDomain(),
+    );
+  }
 }
 
 @embedded
@@ -39,5 +47,12 @@ class PhotoDto {
         NetworkPhoto() => 1,
         _ => 0,
       };
+  }
+
+  Photo toDomain() {
+    return switch (type) {
+      1 => NetworkPhoto(source),
+      _ => AssetPhoto(source, id: id),
+    };
   }
 }

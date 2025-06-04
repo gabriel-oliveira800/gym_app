@@ -36,6 +36,10 @@ class AddMoreInput extends StatelessWidget {
 
     return IconButton(
       icon: Icon(isAdd ? Icons.add : Icons.remove),
+      onLongPress: switch (isMax && !isAdd) {
+        true => null,
+        _ => isAdd ? controller.longIncrement : controller.longDecrement
+      },
       onPressed: switch (isMax && !isAdd) {
         true => null,
         _ => isAdd ? controller.increment : controller.decrement

@@ -5,7 +5,7 @@ class Repository {
   final IDataSource _dataSource;
   const Repository(this._dataSource);
 
-  Future<void> createCategory({
+  Future<Category?> createCategory({
     required String name,
     required Photo photo,
   }) async {
@@ -15,19 +15,17 @@ class Repository {
     );
   }
 
-  Future<void> createExercise({
-    required int day,
-    required int sets,
-    required int reps,
+  Future<Exercise?> createExercise({
     required String name,
-    required String categoryId,
+    required List<int> days,
+    required MapEntry<int, int> max,
+    required List<String> categories,
   }) async {
     return await _dataSource.createExercise(
-      day: day,
-      sets: sets,
-      reps: reps,
+      max: max,
+      days: days,
       name: name,
-      categoryId: categoryId,
+      categories: categories,
     );
   }
 
@@ -35,11 +33,7 @@ class Repository {
     return await _dataSource.getAllCategories();
   }
 
-  Future<Exercises> getAllExercises() async {
+  Future<ExercisesBy> getAllExercises() async {
     return await _dataSource.getAllExercises();
-  }
-
-  Future<Exercises> getByCategoryId(String categoryId) async {
-    return await _dataSource.getByCategoryId(categoryId);
   }
 }

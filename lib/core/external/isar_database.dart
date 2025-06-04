@@ -1,9 +1,8 @@
-import 'dart:developer';
-
 import 'package:path_provider/path_provider.dart';
 import 'package:isar/isar.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../shared/utils.dart';
 import '../repository/index.dart';
 import '../entities/index.dart';
 import 'schemas/index.dart';
@@ -33,7 +32,7 @@ class IsarDatabase implements IDataSource {
   }
 
   @override
-  Future<void> createCategory({
+  Future<Category?> createCategory({
     required String name,
     required Photo photo,
   }) async {
@@ -44,11 +43,40 @@ class IsarDatabase implements IDataSource {
         id: const Uuid().v4(),
       );
 
-      _isar.writeTxnSync(() {
+      return _isar.writeTxnSync(() {
         _isar.categoryDtos.putSync(CategoryDto.by(category));
+        return category;
       });
     } catch (e) {
-      log('Error creating category: $e');
+      Utils.errorToast(e.toString());
+      return null;
+    }
+  }
+
+  @override
+  Future<Exercise?> createExercise({
+    required String name,
+    required List<int> days,
+    required MapEntry<int, int> max,
+    required List<String> categories,
+  }) async {
+    try {
+      final exercise = Exercise(
+        days: days,
+        name: name,
+        series: max.key,
+        categories: categories,
+        repetitions: max.value,
+        id: const Uuid().v4(),
+      );
+
+      return _isar.writeTxnSync(() {
+        _isar.exerciseDtos.putSync(ExerciseDto.by(exercise));
+        return exercise;
+      });
+    } catch (e) {
+      Utils.errorToast(e.toString());
+      return null;
     }
   }
 
@@ -56,97 +84,31 @@ class IsarDatabase implements IDataSource {
   Future<Categories> getAllCategories() async {
     try {
       final categories = await _isar.categoryDtos.where().findAll();
-      if (categories.isEmpty) return [];
-
-      return await Future.wait(
-        categories.map((it) async {
-          return Category(
-            id: it.id,
-            name: it.name,
-            exercises: await getByCategoryId(it.id),
-            photo: switch (it.photo.type) {
-              1 => NetworkPhoto(it.photo.source),
-              _ => AssetPhoto(it.photo.source, id: it.photo.id),
-            },
-          );
-        }),
-      );
+      return categories.map((it) => it.toDomain()).toList();
     } catch (e) {
-      log('Error fetching categories: $e');
+      Utils.errorToast(e.toString());
       return [];
     }
   }
 
   @override
-  Future<void> createExercise({
-    required int day,
-    required int sets,
-    required int reps,
-    required String name,
-    required String categoryId,
-  }) async {
+  Future<ExercisesBy> getAllExercises() async {
     try {
-      final exercise = Exercise(
-        day: day,
-        sets: sets,
-        reps: reps,
-        name: name,
-        categoryId: categoryId,
-        id: const Uuid().v4(),
-      );
+      final all = (await _isar.exerciseDtos.where().findAll())
+          .map((it) => it.toDomain())
+          .toList();
 
-      _isar.writeTxnSync(() {
-        _isar.exerciseDtos.putSync(ExerciseDto.by(exercise));
-      });
+      final result = <int, Exercises>{};
+      final allDay = all.expand((it) => it.days).toSet();
+
+      for (final day in allDay) {
+        result.putIfAbsent(day, () => []);
+        result[day]!.addAll(all.where((it) => it.days.contains(day)));
+      }
+
+      return result.entries.map(ExerciseByWeekday.entry).toList();
     } catch (e) {
-      log('Error: $e');
-    }
-  }
-
-  @override
-  Future<Exercises> getAllExercises() async {
-    try {
-      final data = await _isar.exerciseDtos.where().findAll();
-      if (data.isEmpty) return [];
-
-      return data.map((dto) {
-        return Exercise(
-          id: dto.id,
-          day: dto.day,
-          sets: dto.sets,
-          name: dto.name,
-          reps: dto.reps,
-          categoryId: dto.categoryId,
-        );
-      }).toList();
-    } catch (e) {
-      log('Error: $e');
-      return [];
-    }
-  }
-
-  @override
-  Future<Exercises> getByCategoryId(String categoryId) async {
-    try {
-      final data = await _isar.exerciseDtos
-          .filter()
-          .categoryIdEqualTo(categoryId)
-          .findAll();
-
-      if (data.isEmpty) return [];
-
-      return data.map((dto) {
-        return Exercise(
-          id: dto.id,
-          day: dto.day,
-          sets: dto.sets,
-          name: dto.name,
-          reps: dto.reps,
-          categoryId: dto.categoryId,
-        );
-      }).toList();
-    } catch (e) {
-      log('Error: $e');
+      Utils.errorToast(e.toString());
       return [];
     }
   }

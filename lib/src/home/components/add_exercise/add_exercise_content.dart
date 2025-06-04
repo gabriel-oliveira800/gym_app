@@ -1,18 +1,17 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 
-import '../../components/index.dart';
-import '../../../shared/index.dart';
-import '../../../core/index.dart';
-import '../home_controller.dart';
+import '../../../../shared/states/index.dart';
+import '../../../components/index.dart';
+import '../../../../shared/index.dart';
+import '../../../../core/index.dart';
+import '../index.dart';
 
 class AddExerciseContent extends StatefulWidget {
-  final HomeController controller;
+  final Categories categories;
 
   const AddExerciseContent({
     super.key,
-    required this.controller,
+    required this.categories,
   });
 
   @override
@@ -20,14 +19,14 @@ class AddExerciseContent extends StatefulWidget {
 
   static Future<Exercise?> show(
     BuildContext context, {
-    required HomeController controller,
+    required Categories categories,
   }) async {
     return await showModalBottomSheet<Exercise?>(
       context: context,
       shape: 16.modalShape(),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => AddExerciseContent(controller: controller),
+      builder: (context) => AddExerciseContent(categories: categories),
     );
   }
 }
@@ -37,42 +36,29 @@ class _AddExerciseContentState extends State<AddExerciseContent> {
 
   late final TextEditingController _nameController;
   late final NumberEditingController _repsController;
-  late final NumberEditingController _setsController;
+  late final NumberEditingController _seriesController;
 
-  final _selectedDate = ValueNotifier(DateTime.now().weekday);
+  late final AddExerciseController _controller;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController();
     _repsController = NumberEditingController();
-    _setsController = NumberEditingController();
-  }
+    _seriesController = NumberEditingController();
 
-  Category? _selectedCategory;
-  void onChanged(Category? value) {
-    setState(() => _selectedCategory = value);
+    _controller = AddExerciseController();
   }
-
-  bool _isLoading = false;
-  void _setLoading() => setState(() => _isLoading = !_isLoading);
 
   void _onSubmitButton() async {
-    if (!_formKey.currentState!.validate() || _selectedCategory == null) return;
+    if (!_formKey.currentState!.validate()) return;
 
-    _setLoading();
-
-    await widget.controller.createExercise(
-      day: _selectedDate.value,
-      sets: _setsController.qnt,
-      reps: _repsController.qnt,
-      name: _nameController.text.trim(),
-      categoryId: _selectedCategory!.id,
+    await _controller.create(
+      _nameController.text.trim(),
+      series: _seriesController.qnt,
+      repetitions: _repsController.qnt,
+      onCreated: Navigator.of(context).pop,
     );
-
-    _setLoading();
-
-    Navigator.of(context).pop();
   }
 
   @override
@@ -102,8 +88,8 @@ class _AddExerciseContentState extends State<AddExerciseContent> {
                   ),
                   const Spacing.vertical(32),
                   AnimatedBuilder(
-                    animation: widget.controller.categories,
-                    builder: (_, __) => _dropdownButton(),
+                    animation: _controller.categories,
+                    builder: (_, __) => _categories(),
                   ),
                   const Spacing.vertical(32),
                   TextFormField(
@@ -121,8 +107,8 @@ class _AddExerciseContentState extends State<AddExerciseContent> {
                     animation: Listenable.merge([
                       _nameController,
                       _repsController,
-                      _setsController,
-                      _selectedDate,
+                      _seriesController,
+                      _controller.weekdays,
                     ]),
                     builder: (_, __) => _submitButton(),
                   ),
@@ -133,6 +119,32 @@ class _AddExerciseContentState extends State<AddExerciseContent> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _categories() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          Strings.categories,
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        const Spacing.vertical(8),
+        SizedBox(
+          height: 48,
+          width: double.infinity,
+          child: StateOfBuilder(
+            state: _controller.categories,
+            builder: (categories) => CategoriesList(
+              selected: categories,
+              categories: widget.categories,
+              onChanged: _controller.categories.add,
+              itemStyle: const ListItemStyle(radius: 8),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -154,7 +166,7 @@ class _AddExerciseContentState extends State<AddExerciseContent> {
               ),
               const Spacing.vertical(8),
               AddMoreInput(
-                controller: _setsController,
+                controller: _seriesController,
               ),
             ],
           ),
@@ -184,98 +196,57 @@ class _AddExerciseContentState extends State<AddExerciseContent> {
   }
 
   Widget _dayOfWeek() {
-    return AnimatedBuilder(
-      animation: _selectedDate,
-      builder: (_, __) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            Strings.dayOfWeek,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: ThemeNotifier.whiteOrBlackColor(),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          Strings.dayOfWeek,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: ThemeNotifier.whiteOrBlackColor(),
           ),
-          const Spacing.vertical(8),
-          SizedBox(
-            width: double.infinity,
-            child: WeekDayList(
-              isWrap: true,
-              maxHeight: 40,
-              selected: _selectedDate.value,
-              onChanged: (value) => _selectedDate.value = value,
-              itemStyle: const ListItemStyle(radius: 8),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _dropdownButton() {
-    final items = widget.controller.categories.value.map(
-      (it) => DropdownMenuItem(
-        value: it,
-        child: Text(
-          it.name,
-          style: const TextStyle(fontSize: 16),
         ),
-      ),
-    );
-
-    return DropdownButtonFormField<Category>(
-      items: items.toList(),
-      value: _selectedCategory,
-      onChanged: (it) => _selectedCategory = it,
-      decoration: const InputDecoration(hintText: 'Categoria'),
-      validator: (value) {
-        if (value == null) return 'Selecione uma categoria';
-        return null;
-      },
+        const Spacing.vertical(8),
+        StateOfBuilder(
+          state: _controller.weekdays,
+          builder: (value) => WeekDayList(
+            isWrap: true,
+            maxHeight: 40,
+            selected: value,
+            onChanged: _controller.weekdays.add,
+            itemStyle: const ListItemStyle(
+              radius: 8,
+              padding: EdgeInsets.symmetric(horizontal: 8),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _submitButton() {
-    final isEnabled = _nameController.text.isNotEmpty &&
-        _repsController.text.isNotEmpty &&
-        _setsController.text.isNotEmpty &&
-        _selectedCategory != null;
+    final isEnabled = _nameController.isNotEmpty &&
+        !_repsController.isZero &&
+        !_seriesController.isZero &&
+        !_controller.categories.isEmpty;
 
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: isEnabled ? _onSubmitButton : null,
-        style: ElevatedButton.styleFrom(
-          fixedSize: const Size.fromHeight(48),
-          backgroundColor: ThemeNotifier.whiteOrBlackColor(),
-          foregroundColor: ThemeNotifier.blackOrWhiteColor(),
-        ),
-        child: Visibility(
-          visible: !_isLoading,
-          replacement: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation(
-              ThemeNotifier.blackOrWhiteColor(),
-            ),
-          ),
-          child: const Text(
-            Strings.createExercise,
-            style: TextStyle(fontSize: 16),
-          ),
-        ),
-      ),
+    return Button(
+      isEnabled: isEnabled,
+      onPressed: _onSubmitButton,
+      text: Strings.createExercise,
+      inLoading: _controller.isLoading,
     );
   }
 
   @override
   void dispose() {
     _formKey.currentState?.dispose();
-
-    _selectedDate.dispose();
+    _controller.dispose();
 
     _nameController.dispose();
     _repsController.dispose();
-    _setsController.dispose();
+    _seriesController.dispose();
 
     super.dispose();
   }
